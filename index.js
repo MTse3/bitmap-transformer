@@ -1,24 +1,36 @@
 var fs = require('fs');
-var parseBitmap = require(__dirname + '/lib/bitmap');
+var parse = require(__dirname + '/lib/bitmap');
+
+// Transform functions
 var transform_inversion = require(__dirname + '/lib/transform_inversion');
 
 // Grab starting bitmap file
-var bitmap = fs.readFileSync(__dirname + '/lib/starting-bitmap.bmp');
+var bitmap = fs.readFileSync(__dirname + '/lib/starting_bitmap.bmp');
 
-function transform(bitmap) {
-  parseBitmap.bitmapToArray(bitmap);
+(function transform(bitmap) {
 
-  var pixelArrayStart = findPixelArray(bitmap);
-  var resultsData = [];
-  var resultsColorPalette = [];
+  // Process incoming bitmap into array and find where pixel array starts
+  var bitmapData = parse.bitmapToArray(bitmap);
+  var pixelArrayStart = parse.findPixelArray(bitmap);
 
-  parseBitmap.sliceArray(bitmap, parseBitmap.pixelArrayStart);
+  // Slice up bitmap data into required array sections
+  var slicedArray = parse.sliceArray(bitmapData, pixelArrayStart);
 
-  parseBitmap.sliceArray.colorPalette.forEach(transform_inversion);
+  // Invoke transform on each element of the color palette
+  var resultsColorPalette = slicedArray.colorPalette;
+  resultsColorPalette.forEach(transform_inversion);
 
-  resultsData = sliceArray.header.concat(resultsColorPalette, sliceArray.pixelArray);
-  resultsBuffer = new Buffer(resultsData);
+  // Stitch the data array back together with the transformed color palette
+  var resultsData = slicedArray.header.concat(resultsColorPalette, slicedArray.pixelArray);
 
-  fs.writeFileSync(__dirname + '/output/invertedBitmap.bmp', resultsBuffer);
-}
+  // Create new buffer from transformed data
+  var resultsBuffer = new Buffer(resultsData);
+
+  // Output new bitmap image
+  fs.writeFileSync(__dirname + '/output/inverted_bitmap.bmp', resultsBuffer);
+
+  console.log(bitmap);
+  console.log(resultsBuffer);
+
+})(bitmap); // Invoke transform
 
