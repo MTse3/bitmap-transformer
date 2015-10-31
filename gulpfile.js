@@ -1,6 +1,5 @@
 var gulp = require('gulp');
 var jshint = require('gulp-jshint');
-var jscs = require('gulp-jscs')
 var mocha = require('gulp-mocha');
 
 var appFiles = ['lib/*.js', 'index.js'];
