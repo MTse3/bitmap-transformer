@@ -1,7 +1,7 @@
 var fs = require('fs');
-var parse = require(__dirname + '/lib/bitmap');
+var parse = require(__dirname + '/lib/parse');
 
-// Transform functions
+// Require transform functions
 var transform_inversion = require(__dirname + '/lib/transform_inversion');
 
 // Grab starting bitmap file
@@ -18,7 +18,7 @@ var bitmap = fs.readFileSync(__dirname + '/lib/starting_bitmap.bmp');
 
   // Invoke transform on each element of the color palette
   var resultsColorPalette = slicedArray.colorPalette;
-  resultsColorPalette.forEach(transform_inversion);
+  resultsColorPalette.forE  ach(transform_inversion);
 
   // Stitch the data array back together with the transformed color palette
   var resultsData = slicedArray.header.concat(resultsColorPalette, slicedArray.pixelArray);
@@ -28,9 +28,6 @@ var bitmap = fs.readFileSync(__dirname + '/lib/starting_bitmap.bmp');
 
   // Output new bitmap image
   fs.writeFileSync(__dirname + '/output/inverted_bitmap.bmp', resultsBuffer);
-
-  console.log(bitmap);
-  console.log(resultsBuffer);
 
 })(bitmap); // Invoke transform
 
