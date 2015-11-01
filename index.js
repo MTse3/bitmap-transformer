@@ -6,11 +6,15 @@ var commandType = require(__dirname + '/lib/command').commandType;
 // Require transform functions
 var transform_inversion = require(__dirname + '/lib/transform_inversion');
 
-// Grab starting bitmap file
-var bitmap = fs.readFileSync(__dirname + '/lib/starting_bitmap.bmp');
+// Read starting bitmap file and invoke transform function on callback
+(function processBitmap(callback) {
+  fs.readFile(__dirname + '/lib/starting_bitmap.bmp', function(err, data) {
+    if (err) throw err;
+    callback(data);
+  });
+})(transform);
 
-(function transform(bitmap) {
-
+function transform(bitmap) {
   // Retrieve command-line command, if provided
   var command = commandName();
   var transformCommand = commandType();
@@ -33,7 +37,9 @@ var bitmap = fs.readFileSync(__dirname + '/lib/starting_bitmap.bmp');
   var resultsBuffer = new Buffer(resultsData);
 
   // Output new bitmap image
-  fs.writeFileSync(__dirname + '/output/' + command + '_bitmap.bmp', resultsBuffer);
-
-})(bitmap); // Invoke transform
+  fs.writeFile(__dirname + '/output/' + command + '_bitmap.bmp', resultsBuffer, function(err) {
+    if (err) throw err;
+    console.log('Transform successful!');
+  });
+}
 
