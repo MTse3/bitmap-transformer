@@ -5,14 +5,7 @@ var commandType = require(__dirname + '/lib/command').commandType;
 
 // Require transform functions
 var transform_inversion = require(__dirname + '/lib/transform_inversion');
-
-// Read starting bitmap file and invoke transform function on callback
-(function processBitmap(callback) {
-  fs.readFile(__dirname + '/lib/starting_bitmap.bmp', function(err, data) {
-    if (err) throw err;
-    callback(data);
-  });
-})(transform);
+var transform_grayscale = require(__dirname + '/lib/transform_grayscale');
 
 function transform(bitmap) {
   // Retrieve command-line command, if provided
@@ -26,12 +19,14 @@ function transform(bitmap) {
   // Slice up bitmap data into required array sections
   var slicedArray = parse.sliceArray(bitmapData, pixelArrayStart);
 
-  // Invoke transform on each element of the color palette
-  var resultsColorPalette = slicedArray.colorPalette;
-  resultsColorPalette.forEach(transformCommand);
+  // Invoke transform on the color palette
+  // Pass both grouped and ungrouped palatte arrays because transforms need one or both
+  var colorPalette = slicedArray.colorPalette;
+  var groupedPalette = slicedArray.colorPaletteGrouped();
+  var resultsPalette = transformCommand(colorPalette, groupedPalette);
 
   // Stitch the data array back together with the transformed color palette
-  var resultsData = slicedArray.header.concat(resultsColorPalette, slicedArray.pixelArray);
+  var resultsData = slicedArray.header.concat(resultsPalette, slicedArray.pixelArray);
 
   // Create new buffer from transformed data
   var resultsBuffer = new Buffer(resultsData);
@@ -42,4 +37,12 @@ function transform(bitmap) {
     console.log('Transform successful!');
   });
 }
+
+// Read starting bitmap file and invoke transform function on callback
+(function processBitmap(callback) {
+  fs.readFile(__dirname + '/lib/starting_bitmap.bmp', function(err, data) {
+    if (err) throw err;
+    callback(data);
+  });
+})(transform);
 
