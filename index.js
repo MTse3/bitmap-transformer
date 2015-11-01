@@ -1,6 +1,7 @@
 var fs = require('fs');
 var parse = require(__dirname + '/lib/parse');
-var command = require(__dirname + '/lib/command');
+var commandName = require(__dirname + '/lib/command').commandName;
+var commandType = require(__dirname + '/lib/command').commandType;
 
 // Require transform functions
 var transform_inversion = require(__dirname + '/lib/transform_inversion');
@@ -11,7 +12,8 @@ var bitmap = fs.readFileSync(__dirname + '/lib/starting_bitmap.bmp');
 (function transform(bitmap) {
 
   // Retrieve command-line command, if provided
-  var transformCommand = command();
+  var command = commandName();
+  var transformCommand = commandType();
 
   // Process incoming bitmap into array and find where pixel array starts
   var bitmapData = parse.bitmapToArray(bitmap);
@@ -31,7 +33,7 @@ var bitmap = fs.readFileSync(__dirname + '/lib/starting_bitmap.bmp');
   var resultsBuffer = new Buffer(resultsData);
 
   // Output new bitmap image
-  fs.writeFileSync(__dirname + '/output/inverted_bitmap.bmp', resultsBuffer);
+  fs.writeFileSync(__dirname + '/output/' + command + '_bitmap.bmp', resultsBuffer);
 
 })(bitmap); // Invoke transform
 
